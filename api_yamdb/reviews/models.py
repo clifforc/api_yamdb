@@ -71,7 +71,7 @@ class Review(ReviewCommentBaseModel):
     class Meta(ReviewCommentBaseModel.Meta):
         default_related_name = 'reviews'
         verbose_name = 'отзыв'
-        verbose_name_plural = 'Отзывы' 
+        verbose_name_plural = 'Отзывы'
 
 
 class Comment(ReviewCommentBaseModel):
