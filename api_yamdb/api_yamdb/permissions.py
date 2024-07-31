@@ -16,9 +16,11 @@ class IsAuthorModeratorAdminOrReadOnly(permissions.BasePermission):
                     request.user.role == 'admin')
 
 
-class IsAdmin(permissions.BasePermission):
+class IsAdminOrReadOnly(permissions.BasePermission):
     """
     Custom permission to only allow access to users with the 'admin' role.
     """
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == 'admin'
+        return (request.method in permissions.SAFE_METHODS
+                or request.user.is_authenticated
+                and request.user.role == 'admin')
