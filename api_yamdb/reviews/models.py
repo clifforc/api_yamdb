@@ -17,20 +17,24 @@ class User(AbstractUser):
         return self.username
 
 
-class Categories(models.Model):
+class CommonInfo(models.Model):
     name = models.CharField(max_length=256)
     slug = models.SlugField(max_length=50)
 
     def __str__(self):
         return self.name
 
+    class Meta:
+        abstract = True
+        ordering = ["name"]
 
-class Genres(models.Model):
-    name = models.CharField(max_length=256)
-    slug = models.SlugField(max_length=50)
 
-    def __str__(self):
-        return self.name
+class Categories(CommonInfo):
+    pass
+
+
+class Genres(CommonInfo):
+    pass
 
 
 class Titles(models.Model):
