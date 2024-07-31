@@ -11,6 +11,7 @@ class User(AbstractUser):
     )
 
     email = models.EmailField(unique=True)
+    bio = models.TextField(blank=True)
     role = models.CharField(max_length=20, choices=ROLES, default='user')
     confirmation_code = models.CharField(max_length=255, blank=True)
 
@@ -29,22 +30,20 @@ class CommonInfo(models.Model):
         ordering = ['name']
 
 
-class Categories(CommonInfo):
+class Category(CommonInfo):
     slug = models.SlugField(max_length=50, unique=True)
 
 
-class Genres(CommonInfo):
+class Genre(CommonInfo):
     slug = models.SlugField(max_length=50, unique=True)
 
 
-class Titles(CommonInfo):
+class Title(CommonInfo):
     year = models.IntegerField()
     description = models.TextField(null=True, blank=True)
-    genre = models.ManyToManyField(
-        Genres, on_delete=models.CASCADE, related_name='titles'
-    )
-    categories = models.ForeignKey(
-        Categories, on_delete=models.CASCADE, related_name='titles'
+    genres = models.ManyToManyField(Genre)
+    category = models.ForeignKey(
+        Category, on_delete=models.CASCADE, related_name='titles'
     )
 
 

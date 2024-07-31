@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import Comment, Review, User
+from .models import User, Category, Title, Genre, Comment, Review
 
 
 @admin.register(User)
@@ -27,7 +27,7 @@ class CustomUserAdmin(UserAdmin):
     )
     fieldsets = (
         (None, {'fields': ('username', 'email', 'password')}),
-        ('Personal info', {'fields': ('first_name', 'last_name')}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'bio')}),
         ('Permissions',
          {'fields': ('role', 'is_active', 'is_staff', 'is_superuser')}),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
@@ -50,3 +50,19 @@ class ReviewAdmin(admin.ModelAdmin):
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
     pass
+  
+ 
+@admin.register(Title)
+class TitleAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Genre)
+class GenreAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    pass
+    
