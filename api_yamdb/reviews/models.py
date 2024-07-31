@@ -19,7 +19,6 @@ class User(AbstractUser):
 
 class CommonInfo(models.Model):
     name = models.CharField(max_length=256)
-    slug = models.SlugField(max_length=50)
 
     def __str__(self):
         return self.name
@@ -30,20 +29,19 @@ class CommonInfo(models.Model):
 
 
 class Categories(CommonInfo):
-    pass
+    slug = models.SlugField(max_length=50, unique=True)
 
 
 class Genres(CommonInfo):
-    pass
+    slug = models.SlugField(max_length=50, unique=True)
 
 
-class Titles(models.Model):
-    name = models.CharField(max_length=256)
+class Titles(CommonInfo):
     year = models.IntegerField()
     description = models.TextField(null=True, blank=True)
-    genre = models.ForeignKey(
+    genre = models.ManyToManyField(
         Genres, on_delete=models.CASCADE, related_name='titles'
     )
-
-    def __str__(self):
-        return self.name
+    categories = models.ForeignKey(
+        Categories, on_delete=models.CASCADE, related_name='titles'
+    )
