@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import User
+from .models import User, Category, Title, Genre
 
 
 @admin.register(User)
@@ -40,3 +40,18 @@ class CustomUserAdmin(UserAdmin):
         }),
     )
     ordering = ('username',)
+
+
+@admin.register(Title)
+class TitleAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Genre)
+class GenreAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    pass

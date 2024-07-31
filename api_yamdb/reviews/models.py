@@ -26,23 +26,21 @@ class CommonInfo(models.Model):
 
     class Meta:
         abstract = True
-        ordering = ["name"]
+        ordering = ['name']
 
 
-class Categories(CommonInfo):
+class Category(CommonInfo):
     slug = models.SlugField(max_length=50, unique=True)
 
 
-class Genres(CommonInfo):
+class Genre(CommonInfo):
     slug = models.SlugField(max_length=50, unique=True)
 
 
-class Titles(CommonInfo):
+class Title(CommonInfo):
     year = models.IntegerField()
     description = models.TextField(null=True, blank=True)
-    genre = models.ManyToManyField(
-        Genres, on_delete=models.CASCADE, related_name='titles'
-    )
-    categories = models.ForeignKey(
-        Categories, on_delete=models.CASCADE, related_name='titles'
+    genres = models.ManyToManyField(Genre)
+    category = models.ForeignKey(
+        Category, on_delete=models.CASCADE, related_name='titles'
     )
