@@ -51,7 +51,8 @@ class ReviewCommentBaseModel(models.Model):
     text = models.TextField('Текст', help_text='Текст отзыва')
     author = models.ForeignKey(User, on_delete=models.CASCADE,
                                verbose_name='Автор')
-    pub_date = models.DateField('Дата публикации', auto_now_add=True)
+    pub_date = models.DateTimeField('Дата и время публикации',
+                                    auto_now_add=True)
 
     class Meta:
         abstract = True
@@ -71,6 +72,10 @@ class Review(ReviewCommentBaseModel):
         default_related_name = 'reviews'
         verbose_name = 'отзыв'
         verbose_name_plural = 'Отзывы'
+        constraints = [
+            models.UniqueConstraint(fields=['title', 'author'],
+                                    name='unique_for_title')
+        ]
 
 
 class Comment(ReviewCommentBaseModel):
