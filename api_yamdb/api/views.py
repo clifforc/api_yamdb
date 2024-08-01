@@ -6,6 +6,7 @@ from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.serializers import SignUpSerializer, GetTokenSerializer, CommentSerializer, ReviewSerializer, UserSerializer
@@ -23,6 +24,20 @@ class UserViewSet(viewsets.ModelViewSet):
     pagination_class = PageNumberPagination
     filter_backends = [filters.SearchFilter]
     search_fields = ['$username']
+    lookup_field = 'username'
+
+    @action(detail=False, methods=['get', 'patch'],
+            permission_classes=[IsAuthenticated], url_path='me')
+    def me(self, request):
+        if request.method == 'GET':
+            serializer = self.get_serializer(request.user)
+            return Response(serializer.data)
+        elif request.method == 'PATCH':
+            serializer = self.get_serializer(request.user, data=request.data,
+                                             partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
 
     
 class AuthViewSet(viewsets.ViewSet):
@@ -52,6 +67,7 @@ class AuthViewSet(viewsets.ViewSet):
         return Response({'error': 'Неверный код подтверждения'},
                         status=status.HTTP_400_BAD_REQUEST)
 
+      
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = (IsAuthorModeratorAdminOrReadOnly,)
