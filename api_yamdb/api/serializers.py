@@ -1,7 +1,10 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from reviews.models import Genre, Category, Title
+from rest_framework.exceptions import ValidationError
+
+from reviews.models import Comment, Review, Genre, Category, Title
 from datetime import date
+
 
 User = get_user_model()
 
@@ -61,3 +64,51 @@ class TitleCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Дата произведение не может быть больше текущего года!')
         return data
+
+      
+class SignUpSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('email', 'username',)
+
+    def validate_username(self, value):
+        if value.lower() == 'me':
+            raise serializers.ValidationError(
+                'Использовать имя "me" в качестве username запрещено!'
+            )
+        return value
+        
+        
+class GetTokenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'confirmation_code')
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username'
+    )
+
+    class Meta:
+        model = Review
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
+
+    def validate(self, data):
+        user = self.context.get('request').user
+        title = self.instance.title if self.instance else data.get('title')
+        if user.reviews.filter(title=title).exists():
+            raise ValidationError(
+                'Вы уже оставляли отзыв на это произведение.'
+            )
+        return data
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username'
+    )
+
+    class Meta:
+        model = Comment
+        fields = ('id', 'text', 'author', 'pub_date')
