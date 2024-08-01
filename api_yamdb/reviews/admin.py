@@ -50,8 +50,8 @@ class ReviewAdmin(admin.ModelAdmin):
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
     pass
-  
- 
+
+
 @admin.register(Title)
 class TitleAdmin(admin.ModelAdmin):
     pass
@@ -65,4 +65,3 @@ class GenreAdmin(admin.ModelAdmin):
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     pass
-    
