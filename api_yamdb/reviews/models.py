@@ -60,7 +60,7 @@ class ReviewCommentBaseModel(models.Model):
 
 class Review(ReviewCommentBaseModel):
     title = models.ForeignKey(
-        Titles, on_delete=models.CASCADE, verbose_name='Произведение'
+        Title, on_delete=models.CASCADE, verbose_name='Произведение'
     )
     score = models.IntegerField('Оценка', validators=[
         MinValueValidator(1),
