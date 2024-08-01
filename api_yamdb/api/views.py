@@ -9,10 +9,10 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from api.serializers import SignUpSerializer, GetTokenSerializer, CommentSerializer, ReviewSerializer, UserSerializer
+from api.serializers import SignUpSerializer, GetTokenSerializer, CommentSerializer, ReviewSerializer, UserSerializer, CategorySerializer, GenreSerializer, TitleCreateSerializer, TitleReadSerializer
 from api.utils import send_confirmation_code
 from api.permissions import IsAuthorModeratorAdminOrReadOnly, IsAdmin
-from reviews.models import Comment, Review, Title
+from reviews.models import Comment, Review, Title, Genre, Category, Title
 
 User = get_user_model()
 
@@ -94,3 +94,28 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user, review=self.get_review())
+
+        
+class CommonInfo(viewsets.ModelViewSet):
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+
+
+class GenreViewSet(CommonInfo):
+    serializer_class = GenreSerializer
+    queryset = Genre.objects.all()
+
+
+class CategoryViewSet(CommonInfo):
+    serializer_class = CategorySerializer
+    queryset = Category.objects.all()
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.all()
+    serializer_class = TitleReadSerializer
+
+    def get_serializer_class(self):
+        if self.action in ['create', 'update']:
+            return TitleCreateSerializer
+        return TitleReadSerializer
