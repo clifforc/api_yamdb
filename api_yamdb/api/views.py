@@ -22,8 +22,6 @@ class AuthViewSet(viewsets.ViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
 
-    from rest_framework.exceptions import NotFound
-
     @action(detail=False, methods=['post'], url_path='token')
     def token(self, request):
         serializer = GetTokenSerializer(data=request.data)
