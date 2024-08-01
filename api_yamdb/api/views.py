@@ -21,7 +21,7 @@ class UserViewSet(viewsets.ModelViewSet):
     lookup_field = 'username'
 
     @action(detail=False, methods=['get', 'patch'],
-            permission_classes=[IsAuthenticated])
+            permission_classes=[IsAuthenticated], url_path='me')
     def me(self, request):
         if request.method == 'GET':
             serializer = self.get_serializer(request.user)
