@@ -21,9 +21,7 @@ def send_confirmation_code(user):
     user.confirmation_code = confirmation_code
     user.save()
 
-    subject = 'YaMDb Registration Confirmation'
-    message = f'Your confirmation code is: {confirmation_code}'
-    from_email = 'noreply@yamdb.com'
-    recipient_list = [user.email]
-
-    send_mail(subject, message, from_email, recipient_list)
+    send_mail('YaMDb Registration Confirmation',
+              f'Your confirmation code is: {confirmation_code}',
+              'noreply@yamdb.com',
+              [user.email])
