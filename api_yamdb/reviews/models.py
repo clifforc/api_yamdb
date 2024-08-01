@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from datetime import date
 
 
 class User(AbstractUser):
@@ -39,9 +40,14 @@ class Genre(CommonInfo):
 
 
 class Title(CommonInfo):
-    year = models.IntegerField()
+    year = models.IntegerField(
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(date.today().year)
+        ], help_text="Введите год произведения, не больше текущего."
+    )
     description = models.TextField(null=True, blank=True)
-    genres = models.ManyToManyField(Genre)
+    genre = models.ManyToManyField(Genre)
     category = models.ForeignKey(
         Category, on_delete=models.CASCADE, related_name='titles'
     )
