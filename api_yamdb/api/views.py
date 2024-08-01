@@ -1,9 +1,13 @@
+from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
+from rest_framework.pagination import PageNumberPagination
 
-from api.permissions import IsAuthorModeratorAdminOrReadOnly
-from api.serializers import CommentSerializer, ReviewSerializer
+from api.permissions import IsAuthorModeratorAdminOrReadOnly, IsAdmin
+from api.serializers import CommentSerializer, ReviewSerializer, UserSerializer
 from reviews.models import Comment, Review, Title
+
+User = get_user_model()
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -32,3 +36,11 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user, review=self.get_review())
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (IsAdmin,)
+    pagination_class = PageNumberPagination
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['$username']
