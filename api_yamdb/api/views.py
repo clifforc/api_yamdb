@@ -54,20 +54,18 @@ class AuthViewSet(viewsets.ViewSet):
     def signup(self, request):
         serializer = SignUpSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        username = serializer.validated_data.get('username')
-        email = serializer.validated_data.get('email')
         try:
-            user, _ = User.objects.get_or_create(username=username,
-                                                 email=email)
+            user, _ = User.objects.get_or_create(**serializer.validated_data)
         except IntegrityError as e:
             error_message = str(e)
             if 'username' in error_message:
                 return Response(
-                    "Пользователь с таким username уже зарегистрирован",
+                    {'username': [
+                        'A user with that username already exists.']},
                     status=status.HTTP_400_BAD_REQUEST)
             if 'email' in error_message:
                 return Response(
-                    "Пользователь с таким email уже зарегистрирован",
+                    {'email': ['A user with that email already exists.']},
                     status=status.HTTP_400_BAD_REQUEST)
         else:
             send_confirmation_code(user)
@@ -80,14 +78,14 @@ class AuthViewSet(viewsets.ViewSet):
         user = User.objects.filter(
             username=serializer.validated_data['username']).first()
         if not user:
-            raise NotFound("Пользователь не найден")
+            raise NotFound("User not found")
         if user.confirmation_code == serializer.validated_data[
             'confirmation_code']:
             refresh = RefreshToken.for_user(user)
             return Response({
                 'token': str(refresh.access_token),
             })
-        return Response({'error': 'Неверный код подтверждения'},
+        return Response({'error': 'Wrong confirmation-code'},
                         status=status.HTTP_400_BAD_REQUEST)
 
 

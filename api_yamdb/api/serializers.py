@@ -6,28 +6,26 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from reviews.models import Comment, Review, Genre, Category, Title
+from api.validators import validate_username
 
 User = get_user_model()
 
 
 class SignUpSerializer(serializers.ModelSerializer):
     username = serializers.CharField(max_length=150, required=True,
-                                     validators=[UnicodeUsernameValidator()])
+                                     validators=[UnicodeUsernameValidator(),
+                                                 validate_username])
     email = serializers.EmailField(required=True, max_length=150)
 
     class Meta:
         model = User
         fields = ('email', 'username',)
 
-    def validate_username(self, value):
-        if value.lower() == 'me':
-            raise serializers.ValidationError(
-                'Использовать имя "me" в качестве username запрещено!'
-            )
-        return value
-
 
 class GetTokenSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(max_length=150, required=True)
+    confirmation_code = serializers.CharField(max_length=150, required=True)
+
     class Meta:
         model = User
         fields = ('username', 'confirmation_code')
