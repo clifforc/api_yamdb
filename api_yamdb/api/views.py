@@ -9,7 +9,9 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from api.serializers import SignUpSerializer, GetTokenSerializer, CommentSerializer, ReviewSerializer, UserSerializer, CategorySerializer, GenreSerializer, TitleCreateSerializer, TitleReadSerializer
+from api.serializers import SignUpSerializer, GetTokenSerializer, \
+    CommentSerializer, ReviewSerializer, UserSerializer, CategorySerializer, \
+    GenreSerializer, TitleCreateSerializer, TitleReadSerializer
 from api.utils import send_confirmation_code
 from api.permissions import IsAuthorModeratorAdminOrReadOnly, IsAdmin
 from reviews.models import Comment, Review, Title, Genre, Category, Title
@@ -18,13 +20,14 @@ User = get_user_model()
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by('id')
     serializer_class = UserSerializer
     permission_classes = (IsAdmin,)
     pagination_class = PageNumberPagination
     filter_backends = [filters.SearchFilter]
     search_fields = ['$username']
     lookup_field = 'username'
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     @action(detail=False, methods=['get', 'patch'],
             permission_classes=[IsAuthenticated], url_path='me')
@@ -36,21 +39,23 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(request.user, data=request.data,
                                              partial=True)
             serializer.is_valid(raise_exception=True)
+            if 'role' in request.data:
+                return Response({"message": "You cannot change role"},
+                                status=status.HTTP_400_BAD_REQUEST)
             serializer.save()
             return Response(serializer.data)
 
-    
+
 class AuthViewSet(viewsets.ViewSet):
     permission_classes = [AllowAny]
 
     @action(detail=False, methods=['post'], url_path='signup')
     def signup(self, request):
         serializer = SignUpSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            user = serializer.save()
-            send_confirmation_code(user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        send_confirmation_code(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'], url_path='token')
     def token(self, request):
@@ -69,7 +74,7 @@ class AuthViewSet(viewsets.ViewSet):
         return Response({'error': 'Неверный код подтверждения'},
                         status=status.HTTP_400_BAD_REQUEST)
 
-      
+
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = (IsAuthorModeratorAdminOrReadOnly,)
@@ -97,7 +102,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user, review=self.get_review())
 
-        
+
 class CommonInfo(viewsets.ModelViewSet):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)

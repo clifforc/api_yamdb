@@ -70,7 +70,6 @@ class SignUpSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('email', 'username',)
-        required_fields = fields
 
     def validate_username(self, value):
         if value.lower() == 'me':
@@ -78,8 +77,8 @@ class SignUpSerializer(serializers.ModelSerializer):
                 'Использовать имя "me" в качестве username запрещено!'
             )
         return value
-        
-        
+
+
 class GetTokenSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
