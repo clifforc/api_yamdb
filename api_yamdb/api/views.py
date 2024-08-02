@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
 
 from rest_framework import status, viewsets, filters
@@ -14,7 +15,7 @@ from api.serializers import SignUpSerializer, GetTokenSerializer, \
     GenreSerializer, TitleCreateSerializer, TitleReadSerializer
 from api.utils import send_confirmation_code
 from api.permissions import IsAuthorModeratorAdminOrReadOnly, IsAdmin
-from reviews.models import Comment, Review, Title, Genre, Category, Title
+from reviews.models import Review, Genre, Category, Title
 
 User = get_user_model()
 
@@ -53,9 +54,24 @@ class AuthViewSet(viewsets.ViewSet):
     def signup(self, request):
         serializer = SignUpSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        send_confirmation_code(user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        username = serializer.validated_data.get('username')
+        email = serializer.validated_data.get('email')
+        try:
+            user, _ = User.objects.get_or_create(username=username,
+                                                 email=email)
+        except IntegrityError as e:
+            error_message = str(e)
+            if 'username' in error_message:
+                return Response(
+                    "Пользователь с таким username уже зарегистрирован",
+                    status=status.HTTP_400_BAD_REQUEST)
+            if 'email' in error_message:
+                return Response(
+                    "Пользователь с таким email уже зарегистрирован",
+                    status=status.HTTP_400_BAD_REQUEST)
+        else:
+            send_confirmation_code(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'], url_path='token')
     def token(self, request):

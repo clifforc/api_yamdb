@@ -1,12 +1,36 @@
+from datetime import date
+
 from django.contrib.auth import get_user_model
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from reviews.models import Comment, Review, Genre, Category, Title
-from datetime import date
-
 
 User = get_user_model()
+
+
+class SignUpSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(max_length=150, required=True,
+                                     validators=[UnicodeUsernameValidator()])
+    email = serializers.EmailField(required=True, max_length=150)
+
+    class Meta:
+        model = User
+        fields = ('email', 'username',)
+
+    def validate_username(self, value):
+        if value.lower() == 'me':
+            raise serializers.ValidationError(
+                'Использовать имя "me" в качестве username запрещено!'
+            )
+        return value
+
+
+class GetTokenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'confirmation_code')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -17,14 +41,12 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Category
         fields = ('name', 'slug')
 
 
 class GenreSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Genre
         fields = ('name', 'slug')
@@ -64,25 +86,6 @@ class TitleCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Дата произведение не может быть больше текущего года!')
         return data
-
-      
-class SignUpSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('email', 'username',)
-
-    def validate_username(self, value):
-        if value.lower() == 'me':
-            raise serializers.ValidationError(
-                'Использовать имя "me" в качестве username запрещено!'
-            )
-        return value
-
-
-class GetTokenSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('username', 'confirmation_code')
 
 
 class ReviewSerializer(serializers.ModelSerializer):
