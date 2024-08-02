@@ -70,6 +70,7 @@ class SignUpSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('email', 'username',)
+        required_fields = fields
 
     def validate_username(self, value):
         if value.lower() == 'me':

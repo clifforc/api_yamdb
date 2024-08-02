@@ -6,7 +6,7 @@ from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.serializers import SignUpSerializer, GetTokenSerializer, CommentSerializer, ReviewSerializer, UserSerializer, CategorySerializer, GenreSerializer, TitleCreateSerializer, TitleReadSerializer
@@ -41,10 +41,12 @@ class UserViewSet(viewsets.ModelViewSet):
 
     
 class AuthViewSet(viewsets.ViewSet):
+    permission_classes = [AllowAny]
+
     @action(detail=False, methods=['post'], url_path='signup')
     def signup(self, request):
         serializer = SignUpSerializer(data=request.data)
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             user = serializer.save()
             send_confirmation_code(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
