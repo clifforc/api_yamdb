@@ -19,6 +19,7 @@ from api.utils import send_confirmation_code
 from api.permissions import (IsAuthorModeratorAdminOrReadOnly, IsAdmin,
                              IsAdminOrReadOnly)
 from reviews.models import Comment, Review, Title, Genre, Category, Title
+from .filters import TitleFilter
 
 User = get_user_model()
 
@@ -108,7 +109,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, review=self.get_review())
 
         
-class CommonInfo(viewsets.ModelViewSet, CreateListDestroyViewSet):
+class CommonInfo(CreateListDestroyViewSet):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
@@ -128,8 +129,9 @@ class CategoryViewSet(CommonInfo):
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     permission_classes = (IsAdminOrReadOnly,)
+    filterset_class = TitleFilter
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('genre', 'category', 'name', 'year')
+    http_method_names = ['patch', 'delete', 'get', 'post']
 
     def get_serializer_class(self):
         if self.action in ['create', 'partial_update', 'update']:
