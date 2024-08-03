@@ -15,7 +15,7 @@ class SignUpSerializer(serializers.ModelSerializer):
     username = serializers.CharField(max_length=150, required=True,
                                      validators=[UnicodeUsernameValidator(),
                                                  validate_username])
-    email = serializers.EmailField(required=True, max_length=150)
+    email = serializers.EmailField(required=True, max_length=254)
 
     class Meta:
         model = User
@@ -36,6 +36,13 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('username', 'email', 'first_name', 'last_name',
                   'bio', 'role')
+
+    def validate_username(self, value):
+        if value.lower() == 'me':
+            raise serializers.ValidationError(
+                'Использовать имя "me" в качестве username запрещено.'
+            )
+        return value
 
 
 class CategorySerializer(serializers.ModelSerializer):

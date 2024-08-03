@@ -44,7 +44,7 @@ class UserViewSet(viewsets.ModelViewSet):
                 return Response({"message": "You cannot change role"},
                                 status=status.HTTP_400_BAD_REQUEST)
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class AuthViewSet(viewsets.ViewSet):
