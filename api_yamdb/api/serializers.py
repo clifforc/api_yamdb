@@ -6,25 +6,53 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from reviews.models import Comment, Review, Genre, Category, Title
-from api.validators import validate_username
 
 User = get_user_model()
 
 
 class SignUpSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(max_length=150, required=True,
-                                     validators=[UnicodeUsernameValidator(),
-                                                 validate_username])
-    email = serializers.EmailField(required=True, max_length=254)
+    username = serializers.CharField(
+        required=True,
+        max_length=150,
+        validators=[UnicodeUsernameValidator()]
+    )
+    email = serializers.EmailField(
+        required=True,
+        max_length=254
+    )
 
     class Meta:
         model = User
-        fields = ('email', 'username',)
+        fields = ('email', 'username')
+
+    def validate(self, attr):
+        username = attr['username']
+        email = attr['email']
+
+        if username.lower() == 'me':
+            raise serializers.ValidationError(
+                {"username": "Использовать имя "
+                             "'me' в качестве username запрещено."})
+        elif User.objects.filter(username=username).first():
+            raise serializers.ValidationError(
+                {"username": f"Пользователь "
+                             f"с именем {username} уже существует"})
+        if User.objects.filter(email=email).first():
+            raise serializers.ValidationError(
+                {"email": f"Пользователь с адресом {email} уже существует"}
+            )
+        return attr
 
 
 class GetTokenSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(max_length=150, required=True)
-    confirmation_code = serializers.CharField(max_length=150, required=True)
+    username = serializers.CharField(
+        required=True,
+        max_length=150,
+    )
+    confirmation_code = serializers.CharField(
+        required=True,
+        max_length=10
+    )
 
     class Meta:
         model = User
@@ -32,15 +60,16 @@ class GetTokenSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
-        fields = ('username', 'email', 'first_name', 'last_name',
-                  'bio', 'role')
+        fields = ('username', 'email', 'first_name',
+                  'last_name', 'bio', 'role')
 
     def validate_username(self, value):
         if value.lower() == 'me':
             raise serializers.ValidationError(
-                'Использовать имя "me" в качестве username запрещено.'
+                "Использовать имя 'me' в качестве username запрещено."
             )
         return value
 

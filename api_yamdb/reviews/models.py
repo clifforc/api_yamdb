@@ -12,10 +12,10 @@ class User(AbstractUser):
         ('admin', 'Admin')
     )
 
-    email = models.EmailField(unique=True)
-    bio = models.TextField(blank=True)
+    email = models.EmailField(max_length=254, unique=True)
     role = models.CharField(max_length=20, choices=ROLES, default='user')
-    confirmation_code = models.CharField(max_length=50, blank=True)
+    bio = models.TextField(blank=True)
+    confirmation_code = models.CharField(max_length=10, blank=True)
 
     def __str__(self):
         return self.username
