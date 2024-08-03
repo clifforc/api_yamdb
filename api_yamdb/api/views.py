@@ -7,7 +7,8 @@ from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import (IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.serializers import (SignUpSerializer, GetTokenSerializer,
@@ -18,8 +19,9 @@ from api.serializers import (SignUpSerializer, GetTokenSerializer,
 from api.utils import send_confirmation_code
 from api.permissions import (IsAuthorModeratorAdminOrReadOnly, IsAdmin,
                              IsAdminOrReadOnly)
-from reviews.models import Comment, Review, Title, Genre, Category, Title
-from .filters import TitleFilter
+from reviews.models import Review, Title, Genre, Category, Title
+from api.filters import TitleFilter
+
 
 User = get_user_model()
 
@@ -52,7 +54,7 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer.save()
             return Response(serializer.data)
 
-    
+
 class AuthViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['post'], url_path='signup')
     def signup(self, request):
@@ -72,7 +74,7 @@ class AuthViewSet(viewsets.ViewSet):
         if not user:
             raise NotFound("Пользователь не найден")
         if user.confirmation_code == serializer.validated_data[
-            'confirmation_code']:
+                'confirmation_code']:
             refresh = RefreshToken.for_user(user)
             return Response({
                 'token': str(refresh.access_token),
@@ -80,10 +82,12 @@ class AuthViewSet(viewsets.ViewSet):
         return Response({'error': 'Неверный код подтверждения'},
                         status=status.HTTP_400_BAD_REQUEST)
 
-      
+
 class ReviewViewSet(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticatedOrReadOnly,
+                          IsAuthorModeratorAdminOrReadOnly,)
     serializer_class = ReviewSerializer
-    permission_classes = (IsAuthorModeratorAdminOrReadOnly,)
+    http_method_names = ['patch', 'delete', 'get', 'post']
 
     def get_title(self):
         return get_object_or_404(Title, pk=self.kwargs.get('title_id'))
@@ -97,7 +101,9 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = (IsAuthorModeratorAdminOrReadOnly,)
+    permission_classes = (IsAuthenticatedOrReadOnly,
+                          IsAuthorModeratorAdminOrReadOnly,)
+    http_method_names = ['patch', 'delete', 'get', 'post']
 
     def get_review(self):
         return get_object_or_404(Review, pk=self.kwargs.get('review_id'))
@@ -108,7 +114,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user, review=self.get_review())
 
-        
+
 class CommonInfo(CreateListDestroyViewSet):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
