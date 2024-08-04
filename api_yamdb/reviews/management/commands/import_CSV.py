@@ -20,66 +20,63 @@ class Command(BaseCommand):
         csv_file_path = DIRECTORY + file_name
         with open(csv_file_path, 'r', encoding="utf-8") as file:
             csv_reader = csv.DictReader(file)
-            match file_name:
-                case 'category.csv':
-                    for row in csv_reader:
-                        Category.objects.create(
-                            id=row['id'],
-                            name=row['name'],
-                            slug=row['slug']
-                        )
-                case 'genre.csv':
-                    for row in csv_reader:
-                        Genre.objects.create(
-                            id=row['id'],
-                            name=row['name'],
-                            slug=row['slug']
-                        )
-                case 'users.csv':
-                    for row in csv_reader:
-                        User.objects.create(
-                            id=row['id'],
-                            username=row['username'],
-                            email=row['email'],
-                            role=row['role'],
-                            bio=row['bio'],
-                            first_name=row['first_name'],
-                            last_name=row['last_name']
-                        )
-                case 'titles.csv':
-                    for row in csv_reader:
-                        category_obj = Category.objects.get(id=row['category'])
-                        Title.objects.create(
-                            id=row['id'],
-                            name=row['name'],
-                            year=row['year'],
-                            category=category_obj
-                        )
-                case 'review.csv':
-                    for row in csv_reader:
-                        Review.objects.create(
-                            id=row['id'],
-                            title_id=row['title_id'],
-                            text=row['text'],
-                            author_id=row['author'],
-                            score=row['score'],
-                            pub_date=row['pub_date']
-                        )
-                case 'comments.csv':
-                    for row in csv_reader:
-                        Comment.objects.create(
-                            id=row['id'],
-                            review_id=row['review_id'],
-                            text=row['text'],
-                            author_id=row['author'],
-                            pub_date=row['pub_date']
-                        )
-                case 'genre_title.csv':
-                    for row in csv_reader:
-                        TitleGenre.objects.create(
-                            id=row['id'],
-                            title_id=row['title_id'],
-                            genre_id=row['genre_id']
-                        )
-                case _:
-                    print(ValueError)
+            if file_name == 'category.csv':
+                for row in csv_reader:
+                    Category.objects.create(
+                        id=row['id'],
+                        name=row['name'],
+                        slug=row['slug']
+                    )
+            elif file_name == 'genre.csv':
+                for row in csv_reader:
+                    Genre.objects.create(
+                        id=row['id'],
+                        name=row['name'],
+                        slug=row['slug']
+                    )
+            elif file_name == 'users.csv':
+                for row in csv_reader:
+                    User.objects.create(
+                        id=row['id'],
+                        username=row['username'],
+                        email=row['email'],
+                        role=row['role'],
+                        bio=row['bio'],
+                        first_name=row['first_name'],
+                        last_name=row['last_name']
+                    )
+            elif file_name == 'titles.csv':
+                for row in csv_reader:
+                    category_obj = Category.objects.get(id=row['category'])
+                    Title.objects.create(
+                        id=row['id'],
+                        name=row['name'],
+                        year=row['year'],
+                        category=category_obj
+                    )
+            elif file_name == 'review.csv':
+                for row in csv_reader:
+                    Review.objects.create(
+                        id=row['id'],
+                        title_id=row['title_id'],
+                        text=row['text'],
+                        author_id=row['author'],
+                        score=row['score'],
+                        pub_date=row['pub_date']
+                    )
+            elif file_name == 'comments.csv':
+                for row in csv_reader:
+                    Comment.objects.create(
+                        id=row['id'],
+                        review_id=row['review_id'],
+                        text=row['text'],
+                        author_id=row['author'],
+                        pub_date=row['pub_date']
+                    )
+            elif file_name == 'genre_title.csv':
+                for row in csv_reader:
+                    TitleGenre.objects.create(
+                        id=row['id'],
+                        title_id=row['title_id'],
+                        genre_id=row['genre_id']
+                    )
