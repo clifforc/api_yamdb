@@ -16,10 +16,11 @@ class Command(BaseCommand):
         parser.add_argument('csv_file', type=str, help='Path to the CSV file')
 
     def handle(self, *args, **kwargs):
-        csv_file_path = DIRECTORY + kwargs['csv_file']
+        file_name = kwargs['csv_file']
+        csv_file_path = DIRECTORY + file_name
         with open(csv_file_path, 'r', encoding="utf-8") as file:
             csv_reader = csv.DictReader(file)
-            match (kwargs['csv_file']):
+            match file_name:
                 case 'category.csv':
                     for row in csv_reader:
                         Category.objects.create(
