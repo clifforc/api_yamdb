@@ -2,6 +2,7 @@ from datetime import date
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.db.models import Avg
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -76,12 +77,14 @@ class UserSerializer(serializers.ModelSerializer):
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
+        lookup_field = 'slug'
         model = Category
         fields = ('name', 'slug')
 
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
+        lookup_field = 'slug'
         model = Genre
         fields = ('name', 'slug')
 
@@ -89,12 +92,16 @@ class GenreSerializer(serializers.ModelSerializer):
 class TitleReadSerializer(serializers.ModelSerializer):
     genre = GenreSerializer(required=True, many=True)
     category = CategorySerializer(required=True, many=False)
+    rating = serializers.SerializerMethodField()
 
     class Meta:
         model = Title
         fields = (
-            'id', 'name', 'year', 'description', 'genre', 'category'
+            'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
         )
+
+    def get_rating(self, obj):
+        return obj.reviews.aggregate(Avg('score',)).get('score__avg')
 
 
 class TitleCreateSerializer(serializers.ModelSerializer):
@@ -116,7 +123,7 @@ class TitleCreateSerializer(serializers.ModelSerializer):
         )
 
     def validate(self, data):
-        if data['year'] > date.today().year:
+        if 'year' in data and data['year'] > date.today().year:
             raise serializers.ValidationError(
                 'Дата произведение не может быть больше текущего года!')
         return data
@@ -132,12 +139,13 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ('id', 'text', 'author', 'score', 'pub_date')
 
     def validate(self, data):
-        user = self.context.get('request').user
-        title = self.instance.title if self.instance else data.get('title')
-        if user.reviews.filter(title=title).exists():
-            raise ValidationError(
-                'Вы уже оставляли отзыв на это произведение.'
-            )
+        if self.context.get('view').action == 'create':
+            user = self.context.get('request').user
+            title = self.context.get('view').kwargs.get('title_id')
+            if user.reviews.filter(title=title).exists():
+                raise ValidationError(
+                    'Вы уже оставляли отзыв на это произведение.'
+                )
         return data
 
 
