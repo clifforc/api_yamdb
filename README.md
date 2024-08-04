@@ -10,7 +10,7 @@
 ## Авторы
 
 - Кирилл Мансуров (https://github.com/Kirill374mansurov)
-- Евгений олейников (https://github.com/olejnikoves2)
+- Евгений Олейников (https://github.com/olejnikoves2)
 - Александр Мальцев (https://github.com/clifforc)
 
 ## Описание
