@@ -19,7 +19,7 @@ class Command(BaseCommand):
         csv_file_path = DIRECTORY + kwargs['csv_file']
         with open(csv_file_path, 'r', encoding="utf-8") as file:
             csv_reader = csv.DictReader(file)
-            match kwargs['csv_file']:
+            match (kwargs['csv_file']):
                 case 'category.csv':
                     for row in csv_reader:
                         Category.objects.create(
@@ -80,3 +80,5 @@ class Command(BaseCommand):
                             title_id=row['title_id'],
                             genre_id=row['genre_id']
                         )
+                case _:
+                    print(ValueError)

@@ -8,9 +8,9 @@ def generate_confirmation_code():
     """
     Function returns random code 8 digitsh length
     """
-    return ''.join([random.choice(string.ascii_uppercase +
-                                  string.ascii_lowercase +
-                                  string.digits) for _ in range(8)])
+    return ''.join([random.choice(string.ascii_uppercase
+                                  + string.ascii_lowercase
+                                  + string.digits) for _ in range(8)])
 
 
 def send_confirmation_code(user):

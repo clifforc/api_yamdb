@@ -29,7 +29,7 @@ class CreateListDestroyViewSet(mixins.CreateModelMixin,
                                mixins.ListModelMixin, viewsets.GenericViewSet):
     pass
 
-  
+
 class SignUpViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = User.objects.all()
     serializer_class = SignUpSerializer
@@ -39,8 +39,8 @@ class SignUpViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
         username = request.data.get('username')
         email = request.data.get('email')
 
-        if ((User.objects.filter(username=username).exists() and
-                User.objects.filter(email=email).exists())):
+        if ((User.objects.filter(username=username).exists()
+             and User.objects.filter(email=email).exists())):
             return Response({
                 'username': username,
                 'email': email
