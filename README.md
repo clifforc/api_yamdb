@@ -44,7 +44,7 @@ cd api_yamdb
 Cоздать и активировать виртуальное окружение:
 
 ```
-python3 -m venv .venv
+python -m venv .venv
 ```
 
 * Если у вас Linux/macOS
@@ -60,7 +60,7 @@ python3 -m venv .venv
     ```
 
 ```
-python3 -m pip install --upgrade pip
+python -m pip install --upgrade pip
 ```
 
 Установить зависимости из файла requirements.txt:
@@ -72,13 +72,20 @@ pip install -r requirements.txt
 Выполнить миграции:
 
 ```
-python3 manage.py migrate
+python manage.py makemigrations
+python manage.py migrate
+```
+
+Импортировать данные:
+
+```
+python manage.py run_import
 ```
 
 Запустить проект:
 
 ```
-python3 manage.py runserver
+python manage.py runserver
 ```
 
 ## Примеры запросов к API:

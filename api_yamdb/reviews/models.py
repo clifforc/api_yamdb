@@ -48,9 +48,18 @@ class Title(CommonInfo):
         ], help_text="Введите год произведения, не больше текущего."
     )
     description = models.TextField(null=True, blank=True)
-    genre = models.ManyToManyField(Genre)
+    genre = models.ManyToManyField(Genre, through='TitleGenre')
     category = models.ForeignKey(
-        Category, on_delete=models.CASCADE, related_name='titles'
+        Category, on_delete=models.PROTECT, related_name='titles'
+    )
+
+
+class TitleGenre(models.Model):
+    title = models.ForeignKey(
+        Title, on_delete=models.CASCADE
+    )
+    genre = models.ForeignKey(
+        Genre, on_delete=models.PROTECT
     )
 
 

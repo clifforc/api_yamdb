@@ -20,7 +20,7 @@ from api.serializers import (SignUpSerializer, GetTokenSerializer,
 from api.utils import send_confirmation_code
 from api.permissions import (IsAuthorModeratorAdminOrReadOnly, IsAdmin,
                              IsAdminOrReadOnly)
-from reviews.models import Review, Title, Genre, Category, Title
+from reviews.models import Review, Title, Genre, Category
 from api.filters import TitleFilter
 
 
