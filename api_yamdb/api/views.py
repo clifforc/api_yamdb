@@ -2,26 +2,23 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 
-from rest_framework import status, viewsets, filters, mixins
-from rest_framework.exceptions import NotFound
-from rest_framework.response import Response
+from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import (IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly,
-                                        AllowAny)
+from rest_framework.permissions import (AllowAny, IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
+from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from api.serializers import (SignUpSerializer, GetTokenSerializer,
-                             CommentSerializer, ReviewSerializer,
-                             UserSerializer, CategorySerializer,
-                             GenreSerializer, TitleCreateSerializer,
-                             TitleReadSerializer)
-from api.utils import send_confirmation_code
-from api.permissions import (IsAuthorModeratorAdminOrReadOnly, IsAdmin,
-                             IsAdminOrReadOnly)
-from reviews.models import Review, Title, Genre, Category
 from api.filters import TitleFilter
+from api.permissions import (IsAdmin, IsAdminOrReadOnly,
+                             IsAuthorModeratorAdminOrReadOnly)
+from api.serializers import (CategorySerializer, CommentSerializer,
+                             GenreSerializer, GetTokenSerializer,
+                             ReviewSerializer, SignUpSerializer,
+                             TitleCreateSerializer, TitleReadSerializer,
+                             UserSerializer)
+from api.utils import send_confirmation_code
+from reviews.models import Category, Genre, Review, Title
 
 
 User = get_user_model()
