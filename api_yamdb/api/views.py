@@ -8,7 +8,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import (IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
+                                        IsAuthenticatedOrReadOnly,
+                                        AllowAny)
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.serializers import (SignUpSerializer, GetTokenSerializer,
@@ -31,56 +32,78 @@ class CreateListDestroyViewSet(mixins.CreateModelMixin,
                                mixins.ListModelMixin, viewsets.GenericViewSet):
     pass
 
+  
+class SignUpViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    queryset = User.objects.all()
+    serializer_class = SignUpSerializer
+    permission_classes = [AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        username = request.data.get('username')
+        email = request.data.get('email')
+
+        if ((User.objects.filter(username=username).exists() and
+                User.objects.filter(email=email).exists())):
+            return Response({
+                'username': username,
+                'email': email
+            }, status=status.HTTP_200_OK)
+        else:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+
+            user = User.objects.create_user(**serializer.validated_data)
+            send_confirmation_code(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class GetTokenViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    queryset = User.objects.all()
+    serializer_class = GetTokenSerializer
+    permission_classes = [AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        username = serializer.validated_data['username']
+        confirmation_code = serializer.validated_data['confirmation_code']
+
+        user = get_object_or_404(User, username=username)
+        if user.confirmation_code == confirmation_code:
+            refresh = RefreshToken.for_user(user)
+            return Response({"token": str(refresh.access_token)},
+                            status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Wrong confirmation code."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
 
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by('id')
     serializer_class = UserSerializer
     permission_classes = (IsAdmin,)
-    pagination_class = PageNumberPagination
     filter_backends = [filters.SearchFilter]
     search_fields = ['$username']
     lookup_field = 'username'
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     @action(detail=False, methods=['get', 'patch'],
-            permission_classes=[IsAuthenticated], url_path='me')
+            permission_classes=[IsAuthenticated],
+            url_path='me')
     def me(self, request):
         if request.method == 'GET':
             serializer = self.get_serializer(request.user)
             return Response(serializer.data)
         elif request.method == 'PATCH':
-            serializer = self.get_serializer(request.user, data=request.data,
-                                             partial=True)
+            serializer = self.get_serializer(
+                request.user, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
+            if 'role' in request.data:
+                return Response({"error": "You cannot change role"},
+                                status=status.HTTP_400_BAD_REQUEST)
             serializer.save()
-            return Response(serializer.data)
-
-
-class AuthViewSet(viewsets.ViewSet):
-    @action(detail=False, methods=['post'], url_path='signup')
-    def signup(self, request):
-        serializer = SignUpSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            send_confirmation_code(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
-
-    @action(detail=False, methods=['post'], url_path='token')
-    def token(self, request):
-        serializer = GetTokenSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = User.objects.filter(
-            username=serializer.validated_data['username']).first()
-        if not user:
-            raise NotFound("Пользователь не найден")
-        if user.confirmation_code == serializer.validated_data[
-                'confirmation_code']:
-            refresh = RefreshToken.for_user(user)
-            return Response({
-                'token': str(refresh.access_token),
-            })
-        return Response({'error': 'Неверный код подтверждения'},
-                        status=status.HTTP_400_BAD_REQUEST)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
