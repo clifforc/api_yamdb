@@ -1,5 +1,18 @@
 # Проект API YaMDb
 
+## Технологии
+
+![Django](https://img.shields.io/badge/django-%23092E20.svg?style=for-the-badge&logo=django&logoColor=white)
+![DjangoREST](https://img.shields.io/badge/DJANGO-REST-ff1709?style=for-the-badge&logo=django&logoColor=white&color=ff1709&labelColor=gray)
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
+![Postman](https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white)
+
+## Авторы
+
+- Кирилл Мансуров (https://github.com/Kirill374mansurov)
+- Евгений олейников (https://github.com/olejnikoves2)
+- Александр Мальцев (https://github.com/clifforc)
+
 ## Описание
 
 **YaMDb** - это проект, который собирает отзывы пользователей на различные произведения, такие как книги, фильмы и музыка. Сам проект не хранит произведения; это платформа для пользователей, где они могут делиться своими мнениями и оценками.
