@@ -458,7 +458,7 @@ Authorization: Bearer <your_access_token>
 Права доступа: **Любой авторизованный пользователь**
 
 ```http request
-http://127.0.0.1:8000/api/v1/users/me/
+GET http://127.0.0.1:8000/api/v1/users/me/
 Authorization: Bearer <your_access_token>
 ```
 

@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, status, viewsets
@@ -112,7 +113,9 @@ class CommentViewSet(viewsets.ModelViewSet):
     http_method_names = ['patch', 'delete', 'get', 'post']
 
     def get_review(self):
-        return get_object_or_404(Review, pk=self.kwargs.get('review_id'))
+        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        return get_object_or_404(title.reviews.all(),
+                                 pk=self.kwargs.get('review_id'))
 
     def get_queryset(self):
         return self.get_review().comments.all()
@@ -139,7 +142,7 @@ class CategoryViewSet(CommonInfo):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
+    queryset = Title.objects.annotate(rating=Avg('reviews__score'))
     permission_classes = (IsAdminOrReadOnly,)
     filterset_class = TitleFilter
     filter_backends = (DjangoFilterBackend,)
