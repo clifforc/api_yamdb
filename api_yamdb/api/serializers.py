@@ -6,8 +6,8 @@ from django.db.models import Avg
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from reviews.models import Category, Comment, Genre, Review, Title
 from api_yamdb import constants
+from reviews.models import Category, Comment, Genre, Review, Title
 
 
 User = get_user_model()
