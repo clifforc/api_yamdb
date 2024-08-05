@@ -1,9 +1,9 @@
 from datetime import date
 
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from rest_framework.exceptions import ValidationError
 
 
 class User(AbstractUser):
