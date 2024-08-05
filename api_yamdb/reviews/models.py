@@ -1,21 +1,37 @@
 from datetime import date
 
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
+from api_yamdb import constants
+from api_yamdb.validators import validate_username_not_me
+
 
 class User(AbstractUser):
-    ROLES = (
-        ('user', 'User'),
-        ('moderator', 'Moderator'),
-        ('admin', 'Admin')
+    username = models.CharField(
+        max_length=150,
+        unique=True,
+        validators=[UnicodeUsernameValidator(), validate_username_not_me],
     )
-
-    email = models.EmailField(max_length=254, unique=True)
-    role = models.CharField(max_length=20, choices=ROLES, default='user')
+    email = models.EmailField(
+        max_length=constants.EMAIL_MAX_LENGTH,
+        unique=True)
+    role = models.CharField(
+        max_length=constants.MAX_ROLE_LENGTH,
+        choices=constants.ROLES,
+        default=constants.USER)
     bio = models.TextField(blank=True)
-    confirmation_code = models.CharField(max_length=10, blank=True)
+
+    @property
+    def is_admin(self):
+        return (self.role == constants.ADMIN
+                or self.is_superuser or self.is_staff)
+
+    class Meta(AbstractUser.Meta):
+        verbose_name = 'пользователь'
+        verbose_name_plural = 'Пользователи'
 
     def __str__(self):
         return self.username

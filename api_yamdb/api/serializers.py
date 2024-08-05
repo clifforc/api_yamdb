@@ -7,15 +7,16 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from reviews.models import Category, Comment, Genre, Review, Title
+from api_yamdb import constants
 
 
 User = get_user_model()
 
 
-class SignUpSerializer(serializers.ModelSerializer):
+class SignUpSerializer(serializers.Serializer):
     username = serializers.CharField(
         required=True,
-        max_length=150,
+        max_length=constants.USERNAME_MAX_LENGTH,
         validators=[UnicodeUsernameValidator()]
     )
     email = serializers.EmailField(
@@ -31,29 +32,31 @@ class SignUpSerializer(serializers.ModelSerializer):
         username = attr['username']
         email = attr['email']
 
-        if username.lower() == 'me':
+        if username == constants.NOT_ALLOWED_USERNAME:
             raise serializers.ValidationError(
-                {"username": "Использовать имя "
-                             "'me' в качестве username запрещено."})
-        elif User.objects.filter(username=username).first():
+                {"username": f"Использовать имя {username} "
+                             f"в качестве username запрещено."})
+        elif (User.objects.filter(username=username).exists()
+              and not User.objects.filter(email=email).exists()):
             raise serializers.ValidationError(
                 {"username": f"Пользователь "
                              f"с именем {username} уже существует"})
-        if User.objects.filter(email=email).first():
+        if (User.objects.filter(email=email).exists()
+                and not User.objects.filter(username=username).exists()):
             raise serializers.ValidationError(
                 {"email": f"Пользователь с адресом {email} уже существует"}
             )
         return attr
 
 
-class GetTokenSerializer(serializers.ModelSerializer):
+class GetTokenSerializer(serializers.Serializer):
     username = serializers.CharField(
         required=True,
-        max_length=150,
+        max_length=constants.USERNAME_MAX_LENGTH,
     )
     confirmation_code = serializers.CharField(
         required=True,
-        max_length=10
+        max_length=constants.CONFIRMATION_CODE_MAX_LENGTH
     )
 
     class Meta:
@@ -69,10 +72,10 @@ class UserSerializer(serializers.ModelSerializer):
                   'last_name', 'bio', 'role')
 
     def validate_username(self, value):
-        if value.lower() == 'me':
+        if value == constants.NOT_ALLOWED_USERNAME:
             raise serializers.ValidationError(
-                "Использовать имя 'me' в качестве username запрещено."
-            )
+                {"username": f"Использовать имя '{value}' "
+                             f"в качестве username запрещено."})
         return value
 
 

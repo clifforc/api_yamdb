@@ -1,27 +1,15 @@
-import random
-import string
-
+from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 
-
-def generate_confirmation_code():
-    """
-    Function returns random code 8 digitsh length
-    """
-    return ''.join([random.choice(string.ascii_uppercase
-                                  + string.ascii_lowercase
-                                  + string.digits) for _ in range(8)])
+from api_yamdb import settings
 
 
 def send_confirmation_code(user):
     """
-    Function that sends confirmation code to the recipient
+    Function that sends confirmation code to the recipient.
     """
-    confirmation_code = generate_confirmation_code()
-    user.confirmation_code = confirmation_code
-    user.save()
-
+    confirmation_code = default_token_generator.make_token(user)
     send_mail('YaMDb Registration Confirmation',
               f'Your confirmation code is: {confirmation_code}',
-              'noreply@yamdb.com',
+              settings.REGISTRATION_FROM_EMAIL,
               [user.email])
