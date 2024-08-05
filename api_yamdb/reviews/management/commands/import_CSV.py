@@ -7,6 +7,15 @@ from reviews.models import Category, Comment, Genre, Review, Title, TitleGenre
 
 DIRECTORY = 'static/data/'
 User = get_user_model()
+NAMES_FILE = {
+    'category.csv': "self.category(csv_reader)",
+    'genre.csv': "self.genre(csv_reader)",
+    'users.csv': "self.user(csv_reader)",
+    'titles.csv': "self.title(csv_reader)",
+    'review.csv': "self.review(csv_reader)",
+    'comments.csv': "self.comment(csv_reader)",
+    'genre_title.csv': "self.title_genre(csv_reader)"
+}
 
 
 class Command(BaseCommand):
@@ -87,17 +96,4 @@ class Command(BaseCommand):
         csv_file_path = DIRECTORY + file_name
         with open(csv_file_path, 'r', encoding="utf-8") as file:
             csv_reader = csv.DictReader(file)
-            if file_name == 'category.csv':
-                self.category(csv_reader)
-            elif file_name == 'genre.csv':
-                self.genre(csv_reader)
-            elif file_name == 'users.csv':
-                self.user(csv_reader)
-            elif file_name == 'titles.csv':
-                self.title(csv_reader)
-            elif file_name == 'review.csv':
-                self.review(csv_reader)
-            elif file_name == 'comments.csv':
-                self.comment(csv_reader)
-            elif file_name == 'genre_title.csv':
-                self.title_genre(csv_reader)
+            exec(NAMES_FILE[file_name])

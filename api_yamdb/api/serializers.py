@@ -79,7 +79,6 @@ class UserSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
-        lookup_field = 'slug'
         model = Category
         fields = ('name', 'slug')
 
@@ -87,7 +86,6 @@ class CategorySerializer(serializers.ModelSerializer):
 class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
-        lookup_field = 'slug'
         model = Genre
         fields = ('name', 'slug')
 
@@ -112,6 +110,8 @@ class TitleCreateSerializer(serializers.ModelSerializer):
         queryset=Genre.objects.all(),
         many=True,
         slug_field='slug',
+        allow_empty=False,
+        required=True
     )
 
     category = serializers.SlugRelatedField(
@@ -128,7 +128,8 @@ class TitleCreateSerializer(serializers.ModelSerializer):
     def validate(self, data):
         if 'year' in data and data['year'] > date.today().year:
             raise serializers.ValidationError(
-                'Дата произведение не может быть больше текущего года!')
+                {'year': ['Год произведения не может быть больше текущего!']}
+            )
         return data
 
 
