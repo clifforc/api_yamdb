@@ -36,7 +36,7 @@ class User(AbstractUser):
 
 
 class CommonInfo(models.Model):
-    name = models.CharField(max_length=256)
+    name = models.CharField(max_length=constants.NAME_MAX_LENGTH)
 
     class Meta:
         abstract = True

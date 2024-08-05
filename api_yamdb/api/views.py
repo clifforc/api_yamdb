@@ -20,7 +20,7 @@ from api.serializers import (CategorySerializer, CommentSerializer,
                              TitleCreateSerializer, TitleReadSerializer,
                              UserSerializer)
 from api.utils import send_confirmation_code
-from reviews.models import Category, Genre, Review, Title
+from reviews.models import Category, Genre, Title
 
 
 User = get_user_model()
@@ -145,7 +145,8 @@ class CategoryViewSet(CommonInfo):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.annotate(rating=Avg('reviews__score'))
+    queryset = (Title.objects.annotate(rating=Avg('reviews__score')).
+                order_by('year'))
     permission_classes = (IsAdminOrReadOnly,)
     filterset_class = TitleFilter
     filter_backends = (DjangoFilterBackend,)
