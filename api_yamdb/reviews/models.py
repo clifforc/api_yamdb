@@ -95,12 +95,12 @@ class Review(ReviewCommentBaseModel):
     title = models.ForeignKey(
         Title, on_delete=models.CASCADE, verbose_name='Произведение'
     )
-    score = models.SmallIntegerField(
+    score = models.PositiveSmallIntegerField(
         'Оценка', validators=[
             MinValueValidator(constants.MIN_REVIEW_SCORE),
             MaxValueValidator(constants.MAX_REVIEW_SCORE)
         ], help_text=(f'Введите целое число от {constants.MIN_REVIEW_SCORE} '
-                      f'до   {constants.MAX_REVIEW_SCORE}.')
+                      f'до {constants.MAX_REVIEW_SCORE}.')
     )
 
     class Meta(ReviewCommentBaseModel.Meta):
