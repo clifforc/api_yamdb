@@ -21,7 +21,7 @@ class SignUpSerializer(serializers.Serializer):
     )
     email = serializers.EmailField(
         required=True,
-        max_length=254
+        max_length=constants.EMAIL_MAX_LENGTH
     )
 
     class Meta:
@@ -98,16 +98,13 @@ class GenreSerializer(serializers.ModelSerializer):
 class TitleReadSerializer(serializers.ModelSerializer):
     genre = GenreSerializer(required=True, many=True)
     category = CategorySerializer(required=True, many=False)
-    rating = serializers.SerializerMethodField()
+    rating = serializers.IntegerField()
 
     class Meta:
         model = Title
         fields = (
             'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
         )
-
-    def get_rating(self, obj):
-        return obj.reviews.aggregate(Avg('score',)).get('score__avg')
 
 
 class TitleCreateSerializer(serializers.ModelSerializer):

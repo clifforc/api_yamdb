@@ -11,7 +11,7 @@ from api_yamdb.validators import validate_username_not_me
 
 class User(AbstractUser):
     username = models.CharField(
-        max_length=150,
+        max_length=constants.USERNAME_MAX_LENGTH,
         unique=True,
         validators=[UnicodeUsernameValidator(), validate_username_not_me],
     )
@@ -95,10 +95,13 @@ class Review(ReviewCommentBaseModel):
     title = models.ForeignKey(
         Title, on_delete=models.CASCADE, verbose_name='Произведение'
     )
-    score = models.IntegerField('Оценка', validators=[
-        MinValueValidator(1),
-        MaxValueValidator(10)
-    ], help_text="Введите целое число от 1 до 10.")
+    score = models.SmallIntegerField(
+        'Оценка', validators=[
+            MinValueValidator(constants.MIN_REVIEW_SCORE),
+            MaxValueValidator(constants.MAX_REVIEW_SCORE)
+        ], help_text=(f'Введите целое число от {constants.MIN_REVIEW_SCORE} '
+                      f'до   {constants.MAX_REVIEW_SCORE}.')
+    )
 
     class Meta(ReviewCommentBaseModel.Meta):
         default_related_name = 'reviews'
