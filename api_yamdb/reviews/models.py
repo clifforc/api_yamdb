@@ -1,13 +1,10 @@
-from datetime import date
-
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.validators import UnicodeUsernameValidator
-from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from api_yamdb import constants
-from api_yamdb.validators import validate_username_not_me
+from api_yamdb.validators import validate_username_not_me, validate_max_year
 
 
 class User(AbstractUser):
@@ -66,13 +63,6 @@ class Genre(CommonInfo, CommonInfoCategoryGenre):
 
     class Meta(CommonInfo.Meta):
         verbose_name = 'genre'
-
-
-def validate_max_year(value):
-    if value <= date.today().year:
-        return value
-    else:
-        raise ValidationError('Введите год произведения, не больше текущего.')
 
 
 class Title(CommonInfo):
