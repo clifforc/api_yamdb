@@ -5,7 +5,7 @@ from .models import Category, Comment, Genre, Review, Title, TitleGenre, User
 
 
 @admin.register(User)
-class CustomUserAdmin(UserAdmin):
+class UserAdmin(UserAdmin):
     list_display = (
         'username',
         'email',
@@ -39,6 +39,7 @@ class CustomUserAdmin(UserAdmin):
                        'role', 'is_staff', 'is_active')
         }),
     )
+    list_editable = ('role',)
     ordering = ('username',)
 
 
