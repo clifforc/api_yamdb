@@ -1,12 +1,10 @@
-from datetime import date
-
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from api_yamdb import constants
-from api_yamdb.validators import validate_username_not_me
+from api_yamdb.validators import validate_username_not_me, validate_max_year
 
 
 class User(AbstractUser):
@@ -40,34 +38,45 @@ class User(AbstractUser):
 class CommonInfo(models.Model):
     name = models.CharField(max_length=256)
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         abstract = True
         ordering = ['name']
 
+    def __str__(self):
+        return self.name
 
-class Category(CommonInfo):
-    slug = models.SlugField(max_length=50, unique=True)
+
+class CommonInfoCategoryGenre(models.Model):
+    slug = models.SlugField(unique=True)
+
+    class Meta:
+        abstract = True
 
 
-class Genre(CommonInfo):
-    slug = models.SlugField(max_length=50, unique=True)
+class Category(CommonInfo, CommonInfoCategoryGenre):
+
+    class Meta(CommonInfo.Meta):
+        verbose_name = 'category'
+
+
+class Genre(CommonInfo, CommonInfoCategoryGenre):
+
+    class Meta(CommonInfo.Meta):
+        verbose_name = 'genre'
 
 
 class Title(CommonInfo):
-    year = models.IntegerField(
-        validators=[
-            MinValueValidator(1),
-            MaxValueValidator(date.today().year)
-        ], help_text="Введите год произведения, не больше текущего."
+    year = models.SmallIntegerField(
+        validators=[validate_max_year]
     )
     description = models.TextField(null=True, blank=True)
     genre = models.ManyToManyField(Genre, through='TitleGenre')
     category = models.ForeignKey(
         Category, on_delete=models.PROTECT, related_name='titles'
     )
+
+    class Meta(CommonInfo.Meta):
+        verbose_name = 'title'
 
 
 class TitleGenre(models.Model):

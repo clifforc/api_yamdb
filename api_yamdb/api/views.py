@@ -6,7 +6,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import (AllowAny, IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
+                                        IsAuthenticatedOrReadOnly,
+                                        SAFE_METHODS)
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -134,11 +135,13 @@ class CommonInfo(CreateListDestroyViewSet):
 class GenreViewSet(CommonInfo):
     serializer_class = GenreSerializer
     queryset = Genre.objects.all()
+    lookup_field = 'slug'
 
 
 class CategoryViewSet(CommonInfo):
     serializer_class = CategorySerializer
     queryset = Category.objects.all()
+    lookup_field = 'slug'
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -147,8 +150,9 @@ class TitleViewSet(viewsets.ModelViewSet):
     filterset_class = TitleFilter
     filter_backends = (DjangoFilterBackend,)
     http_method_names = ['patch', 'delete', 'get', 'post']
+    ordering_fields = ['name', 'year']
 
     def get_serializer_class(self):
-        if self.action in ['create', 'partial_update', 'update']:
+        if self.request.method not in SAFE_METHODS:
             return TitleCreateSerializer
         return TitleReadSerializer
