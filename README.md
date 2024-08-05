@@ -4,6 +4,38 @@
 
 **YaMDb** - это проект, который собирает отзывы пользователей на различные произведения, такие как книги, фильмы и музыка. Сам проект не хранит произведения; это платформа для пользователей, где они могут делиться своими мнениями и оценками.
 
+## Технологии
+
+![Django](https://img.shields.io/badge/django-%23092E20.svg?style=for-the-badge&logo=django&logoColor=white)
+![DjangoREST](https://img.shields.io/badge/DJANGO-REST-ff1709?style=for-the-badge&logo=django&logoColor=white&color=ff1709&labelColor=gray)
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
+![Postman](https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white)
+
+## Авторы
+
+### [Кирилл Мансуров](https://github.com/Kirill374mansurov)</br>
+Разрабатывал модели, view и эндпойнты для:
+- произведений, 
+- категорий, 
+- жанров;</br> 
+Реализация импорта данных из csv файлов. 
+    
+
+### [Евгений Олейников](https://github.com/olejnikoves2)</br>
+Разрабатывал модели, view и эндпойнты для:
+- отзывов, 
+- комментариев, 
+- рейтингов произведений.
+    
+
+### [Александр Мальцев](https://github.com/clifforc)</br>
+Разрабатывал часть, касающуюся управления пользователями:
+- систему регистрации и аутентификации, 
+- права доступа, 
+- работу с токеном, 
+- систему подтверждения через e-mail.
+  
+
 ## Функциональность
 
 - Произведения разделены на категории (например, "Книги", "Фильмы", "Музыка")
@@ -426,7 +458,7 @@ Authorization: Bearer <your_access_token>
 Права доступа: **Любой авторизованный пользователь**
 
 ```http request
-http://127.0.0.1:8000/api/v1/users/me/
+GET http://127.0.0.1:8000/api/v1/users/me/
 Authorization: Bearer <your_access_token>
 ```
 

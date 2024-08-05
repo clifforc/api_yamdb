@@ -1,57 +1,82 @@
-from datetime import date
-
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
+from api_yamdb import constants
+from api_yamdb.validators import validate_username_not_me, validate_max_year
+
 
 class User(AbstractUser):
-    ROLES = (
-        ('user', 'User'),
-        ('moderator', 'Moderator'),
-        ('admin', 'Admin')
+    username = models.CharField(
+        max_length=constants.USERNAME_MAX_LENGTH,
+        unique=True,
+        validators=[UnicodeUsernameValidator(), validate_username_not_me],
     )
-
-    email = models.EmailField(max_length=254, unique=True)
-    role = models.CharField(max_length=20, choices=ROLES, default='user')
+    email = models.EmailField(
+        max_length=constants.EMAIL_MAX_LENGTH,
+        unique=True)
+    role = models.CharField(
+        max_length=constants.MAX_ROLE_LENGTH,
+        choices=constants.ROLES,
+        default=constants.USER)
     bio = models.TextField(blank=True)
-    confirmation_code = models.CharField(max_length=10, blank=True)
+
+    @property
+    def is_admin(self):
+        return (self.role == constants.ADMIN
+                or self.is_superuser or self.is_staff)
+
+    class Meta(AbstractUser.Meta):
+        verbose_name = 'пользователь'
+        verbose_name_plural = 'Пользователи'
 
     def __str__(self):
         return self.username
 
 
 class CommonInfo(models.Model):
-    name = models.CharField(max_length=256)
-
-    def __str__(self):
-        return self.name
+    name = models.CharField(max_length=constants.NAME_MAX_LENGTH)
 
     class Meta:
         abstract = True
         ordering = ['name']
 
+    def __str__(self):
+        return self.name
 
-class Category(CommonInfo):
-    slug = models.SlugField(max_length=50, unique=True)
+
+class CommonInfoCategoryGenre(models.Model):
+    slug = models.SlugField(unique=True)
+
+    class Meta:
+        abstract = True
 
 
-class Genre(CommonInfo):
-    slug = models.SlugField(max_length=50, unique=True)
+class Category(CommonInfo, CommonInfoCategoryGenre):
+
+    class Meta(CommonInfo.Meta):
+        verbose_name = 'category'
+
+
+class Genre(CommonInfo, CommonInfoCategoryGenre):
+
+    class Meta(CommonInfo.Meta):
+        verbose_name = 'genre'
 
 
 class Title(CommonInfo):
-    year = models.IntegerField(
-        validators=[
-            MinValueValidator(1),
-            MaxValueValidator(date.today().year)
-        ], help_text="Введите год произведения, не больше текущего."
+    year = models.SmallIntegerField(
+        validators=[validate_max_year]
     )
     description = models.TextField(null=True, blank=True)
     genre = models.ManyToManyField(Genre, through='TitleGenre')
     category = models.ForeignKey(
         Category, on_delete=models.PROTECT, related_name='titles'
     )
+
+    class Meta(CommonInfo.Meta):
+        verbose_name = 'title'
 
 
 class TitleGenre(models.Model):
@@ -79,10 +104,13 @@ class Review(ReviewCommentBaseModel):
     title = models.ForeignKey(
         Title, on_delete=models.CASCADE, verbose_name='Произведение'
     )
-    score = models.IntegerField('Оценка', validators=[
-        MinValueValidator(1),
-        MaxValueValidator(10)
-    ], help_text="Введите целое число от 1 до 10.")
+    score = models.PositiveSmallIntegerField(
+        'Оценка', validators=[
+            MinValueValidator(constants.MIN_REVIEW_SCORE),
+            MaxValueValidator(constants.MAX_REVIEW_SCORE)
+        ], help_text=(f'Введите целое число от {constants.MIN_REVIEW_SCORE} '
+                      f'до {constants.MAX_REVIEW_SCORE}.')
+    )
 
     class Meta(ReviewCommentBaseModel.Meta):
         default_related_name = 'reviews'

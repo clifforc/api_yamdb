@@ -1,11 +1,11 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import Category, Comment, Genre, Review, Title, User
+from .models import Category, Comment, Genre, Review, Title, TitleGenre, User
 
 
 @admin.register(User)
-class CustomUserAdmin(UserAdmin):
+class UserAdmin(UserAdmin):
     list_display = (
         'username',
         'email',
@@ -39,6 +39,7 @@ class CustomUserAdmin(UserAdmin):
                        'role', 'is_staff', 'is_active')
         }),
     )
+    list_editable = ('role',)
     ordering = ('username',)
 
 
@@ -52,9 +53,22 @@ class CommentAdmin(admin.ModelAdmin):
     pass
 
 
+class GenreInline(admin.StackedInline):
+    model = TitleGenre
+    extra = 0
+
+
 @admin.register(Title)
 class TitleAdmin(admin.ModelAdmin):
-    pass
+    list_display = (
+        'name',
+        'year',
+        'category',
+    )
+    list_editable = ('year', 'category',)
+    inlines = (
+        GenreInline,
+    )
 
 
 @admin.register(Genre)
