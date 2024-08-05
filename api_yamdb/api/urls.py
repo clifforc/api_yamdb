@@ -9,9 +9,9 @@ from api.views import (
 app_name = 'api'
 
 router_v1 = routers.DefaultRouter()
-router_v1.register(r'auth/signup', SignUpViewSet, basename='signup')
-router_v1.register(r'auth/token', GetTokenViewSet, basename='token')
-router_v1.register(r'users', UserViewSet, basename='user')
+router_v1.register('auth/signup', SignUpViewSet, basename='signup')
+router_v1.register('auth/token', GetTokenViewSet, basename='token')
+router_v1.register('users', UserViewSet, basename='user')
 router_v1.register(
     r'titles/(?P<title_id>\d+)/reviews', ReviewViewSet,
     'title-reviews')
