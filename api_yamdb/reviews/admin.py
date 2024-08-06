@@ -74,6 +74,8 @@ class TitleAdmin(admin.ModelAdmin):
     def genres(self, obj):
         return ",\n".join([g.name for g in obj.genre.all()])
 
+    genres.short_description = "Жанры"
+
 
 @admin.register(Genre)
 class GenreAdmin(admin.ModelAdmin):
