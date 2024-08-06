@@ -9,7 +9,7 @@ def validate_username_not_me(value):
     if value == constants.NOT_ALLOWED_USERNAME:
         raise ValidationError(
             {"username": f"Использовать имя '{value}' "
-                         f"в качестве username запрещено."}
+                         "в качестве username запрещено."}
         )
 
 

@@ -22,17 +22,21 @@ class User(AbstractUser):
         default=constants.USER)
     bio = models.TextField(blank=True)
 
-    @property
-    def is_admin(self):
-        return (self.role == constants.ADMIN
-                or self.is_superuser or self.is_staff)
-
     class Meta(AbstractUser.Meta):
+        ordering = ['username']
         verbose_name = 'пользователь'
         verbose_name_plural = 'Пользователи'
 
     def __str__(self):
         return self.username
+
+    @property
+    def is_admin(self):
+        return self.role == constants.ADMIN or self.is_staff
+
+    @property
+    def is_moderator(self):
+        return self.role == constants.MODERATOR
 
 
 class CommonInfo(models.Model):

@@ -2,7 +2,6 @@ from datetime import date
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.validators import UnicodeUsernameValidator
-from django.db.models import Avg
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -24,10 +23,6 @@ class SignUpSerializer(serializers.Serializer):
         max_length=constants.EMAIL_MAX_LENGTH
     )
 
-    class Meta:
-        model = User
-        fields = ('email', 'username')
-
     def validate(self, attr):
         username = attr['username']
         email = attr['email']
@@ -35,11 +30,11 @@ class SignUpSerializer(serializers.Serializer):
         if username == constants.NOT_ALLOWED_USERNAME:
             raise serializers.ValidationError(
                 {"username": f"Использовать имя {username} "
-                             f"в качестве username запрещено."})
+                             "в качестве username запрещено."})
         elif (User.objects.filter(username=username).exists()
               and not User.objects.filter(email=email).exists()):
             raise serializers.ValidationError(
-                {"username": f"Пользователь "
+                {"username": "Пользователь "
                              f"с именем {username} уже существует"})
         if (User.objects.filter(email=email).exists()
                 and not User.objects.filter(username=username).exists()):
@@ -47,6 +42,10 @@ class SignUpSerializer(serializers.Serializer):
                 {"email": f"Пользователь с адресом {email} уже существует"}
             )
         return attr
+
+    def create(self, validated_data):
+        user, _ = User.objects.get_or_create(**validated_data)
+        return user
 
 
 class GetTokenSerializer(serializers.Serializer):
@@ -58,10 +57,6 @@ class GetTokenSerializer(serializers.Serializer):
         required=True,
         max_length=constants.CONFIRMATION_CODE_MAX_LENGTH
     )
-
-    class Meta:
-        model = User
-        fields = ('username', 'confirmation_code')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -75,7 +70,7 @@ class UserSerializer(serializers.ModelSerializer):
         if value == constants.NOT_ALLOWED_USERNAME:
             raise serializers.ValidationError(
                 {"username": f"Использовать имя '{value}' "
-                             f"в качестве username запрещено."})
+                             "в качестве username запрещено."})
         return value
 
 
