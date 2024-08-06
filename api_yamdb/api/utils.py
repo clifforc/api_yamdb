@@ -1,7 +1,7 @@
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 
-from api_yamdb import settings
+from django.conf import settings
 
 
 def send_confirmation_code(user):

@@ -12,27 +12,45 @@ class User(AbstractUser):
         max_length=constants.USERNAME_MAX_LENGTH,
         unique=True,
         validators=[UnicodeUsernameValidator(), validate_username_not_me],
+        verbose_name='Имя пользователя'
     )
     email = models.EmailField(
         max_length=constants.EMAIL_MAX_LENGTH,
-        unique=True)
+        unique=True
+    )
+    first_name = models.CharField(
+        max_length=constants.FIRSTNAME_MAX_LENGTH,
+        blank=True,
+        verbose_name='Имя'
+    )
+    last_name = models.CharField(
+        max_length=constants.LASTNAME_MAX_LENGTH,
+        blank=True,
+        verbose_name='Фамилия'
+    )
     role = models.CharField(
         max_length=constants.MAX_ROLE_LENGTH,
         choices=constants.ROLES,
-        default=constants.USER)
-    bio = models.TextField(blank=True)
-
-    @property
-    def is_admin(self):
-        return (self.role == constants.ADMIN
-                or self.is_superuser or self.is_staff)
+        default=constants.USER,
+        verbose_name='Роль'
+    )
+    bio = models.TextField(blank=True, verbose_name='О себе')
 
     class Meta(AbstractUser.Meta):
+        ordering = ['username']
         verbose_name = 'пользователь'
         verbose_name_plural = 'Пользователи'
 
     def __str__(self):
         return self.username
+
+    @property
+    def is_admin(self):
+        return self.role == constants.ADMIN or self.is_staff
+
+    @property
+    def is_moderator(self):
+        return self.role == constants.MODERATOR
 
 
 class CommonInfo(models.Model):
