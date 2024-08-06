@@ -53,15 +53,24 @@ class CommentAdmin(admin.ModelAdmin):
     pass
 
 
+@admin.register(TitleGenre)
+class TitleGenre(admin.ModelAdmin):
+    list_display = (
+        'title',
+        'genre'
+    )
+
+
 @admin.register(Title)
 class TitleAdmin(admin.ModelAdmin):
     list_display = (
         'name',
         'year',
         'category',
-        'genres'
+        'genres',
     )
-    list_editable = ('year', 'category',)
+    list_editable = ('year', 'category')
+    filter_horizontal = ('genre',)
 
     def genres(self, obj):
         return ",\n".join([g.name for g in obj.genre.all()])
