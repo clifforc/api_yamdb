@@ -115,12 +115,12 @@ class TitleGenre(models.Model):
         Genre, on_delete=models.PROTECT
     )
 
-    def __str__(self):
-        return f"{self.title} - {self.genre}"
-
     class Meta:
         verbose_name = 'жанр произведения'
         verbose_name_plural = 'Жанры произведения'
+
+    def __str__(self):
+        return f"{self.title} - {self.genre}"
 
 
 class ReviewCommentBaseModel(models.Model):
@@ -133,6 +133,9 @@ class ReviewCommentBaseModel(models.Model):
     class Meta:
         abstract = True
         ordering = ['-pub_date']
+
+    def __str__(self):
+        return self.text[:constants.SHORT_REVIEW_COMMENT]
 
 
 class Review(ReviewCommentBaseModel):
