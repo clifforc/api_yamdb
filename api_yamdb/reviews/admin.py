@@ -64,11 +64,15 @@ class TitleAdmin(admin.ModelAdmin):
         'name',
         'year',
         'category',
+        'genres'
     )
     list_editable = ('year', 'category',)
     inlines = (
         GenreInline,
     )
+
+    def genres(self, obj):
+        return ",\n".join([g.name for g in obj.genre.all()])
 
 
 @admin.register(Genre)

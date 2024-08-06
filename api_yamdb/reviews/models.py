@@ -87,6 +87,9 @@ class TitleGenre(models.Model):
         Genre, on_delete=models.PROTECT
     )
 
+    class Meta:
+        verbose_name = 'title_genre'
+
     def __str__(self):
         return '__all__'
 
