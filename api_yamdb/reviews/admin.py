@@ -27,10 +27,10 @@ class UserAdmin(UserAdmin):
     )
     fieldsets = (
         (None, {'fields': ('username', 'email', 'password')}),
-        ('Personal info', {'fields': ('first_name', 'last_name', 'bio')}),
-        ('Permissions',
+        ('Персональная информация', {'fields': ('first_name', 'last_name', 'bio')}),
+        ('Разрешения',
          {'fields': ('role', 'is_active', 'is_staff', 'is_superuser')}),
-        ('Important dates', {'fields': ('last_login', 'date_joined')}),
+        ('Важные даты', {'fields': ('last_login', 'date_joined')}),
     )
     add_fieldsets = (
         (None, {
@@ -53,9 +53,12 @@ class CommentAdmin(admin.ModelAdmin):
     pass
 
 
-class GenreInline(admin.StackedInline):
-    model = TitleGenre
-    extra = 0
+@admin.register(TitleGenre)
+class TitleGenre(admin.ModelAdmin):
+    list_display = (
+        'title',
+        'genre'
+    )
 
 
 @admin.register(Title)
@@ -64,11 +67,15 @@ class TitleAdmin(admin.ModelAdmin):
         'name',
         'year',
         'category',
+        'genres',
     )
-    list_editable = ('year', 'category',)
-    inlines = (
-        GenreInline,
-    )
+    list_editable = ('year', 'category')
+    filter_horizontal = ('genre',)
+
+    def genres(self, obj):
+        return ",\n".join([g.name for g in obj.genre.all()])
+
+    genres.short_description = "Жанры"
 
 
 @admin.register(Genre)

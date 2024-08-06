@@ -23,10 +23,6 @@ class SignUpSerializer(serializers.Serializer):
         max_length=constants.EMAIL_MAX_LENGTH
     )
 
-    class Meta:
-        model = User
-        fields = ('email', 'username')
-
     def validate(self, attr):
         username = attr['username']
         email = attr['email']
@@ -34,11 +30,11 @@ class SignUpSerializer(serializers.Serializer):
         if username == constants.NOT_ALLOWED_USERNAME:
             raise serializers.ValidationError(
                 {"username": f"Использовать имя {username} "
-                             f"в качестве username запрещено."})
+                             "в качестве username запрещено."})
         elif (User.objects.filter(username=username).exists()
               and not User.objects.filter(email=email).exists()):
             raise serializers.ValidationError(
-                {"username": f"Пользователь "
+                {"username": "Пользователь "
                              f"с именем {username} уже существует"})
         if (User.objects.filter(email=email).exists()
                 and not User.objects.filter(username=username).exists()):
@@ -46,6 +42,10 @@ class SignUpSerializer(serializers.Serializer):
                 {"email": f"Пользователь с адресом {email} уже существует"}
             )
         return attr
+
+    def create(self, validated_data):
+        user, _ = User.objects.get_or_create(**validated_data)
+        return user
 
 
 class GetTokenSerializer(serializers.Serializer):
@@ -57,10 +57,6 @@ class GetTokenSerializer(serializers.Serializer):
         required=True,
         max_length=constants.CONFIRMATION_CODE_MAX_LENGTH
     )
-
-    class Meta:
-        model = User
-        fields = ('username', 'confirmation_code')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -74,7 +70,7 @@ class UserSerializer(serializers.ModelSerializer):
         if value == constants.NOT_ALLOWED_USERNAME:
             raise serializers.ValidationError(
                 {"username": f"Использовать имя '{value}' "
-                             f"в качестве username запрещено."})
+                             "в качестве username запрещено."})
         return value
 
 
@@ -95,7 +91,7 @@ class GenreSerializer(serializers.ModelSerializer):
 class TitleReadSerializer(serializers.ModelSerializer):
     genre = GenreSerializer(required=True, many=True)
     category = CategorySerializer(required=True, many=False)
-    rating = serializers.IntegerField()
+    rating = serializers.IntegerField(read_only=True, default=0)
 
     class Meta:
         model = Title
@@ -110,9 +106,9 @@ class TitleCreateSerializer(serializers.ModelSerializer):
         many=True,
         slug_field='slug',
         allow_empty=False,
-        required=True
+        required=True,
+        allow_null=False
     )
-
     category = serializers.SlugRelatedField(
         queryset=Category.objects.all(),
         slug_field='slug',
@@ -124,12 +120,12 @@ class TitleCreateSerializer(serializers.ModelSerializer):
             'id', 'name', 'year', 'description', 'genre', 'category'
         )
 
-    def validate(self, data):
-        if 'year' in data and data['year'] > date.today().year:
+    def validate_year(self, value):
+        if value is not None and value > date.today().year:
             raise serializers.ValidationError(
-                {'year': ['Год произведения не может быть больше текущего!']}
+                {value: ['Год произведения не может быть больше текущего!']}
             )
-        return data
+        return value
 
 
 class ReviewSerializer(serializers.ModelSerializer):

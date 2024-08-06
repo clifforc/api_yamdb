@@ -1,7 +1,5 @@
 from rest_framework import permissions
 
-from api_yamdb import constants
-
 
 class IsAuthorModeratorAdminOrReadOnly(permissions.BasePermission):
     """
@@ -13,7 +11,7 @@ class IsAuthorModeratorAdminOrReadOnly(permissions.BasePermission):
         return (request.method in permissions.SAFE_METHODS
                 or (request.user.is_authenticated
                     and (obj.author == request.user
-                         or request.user.role == constants.MODERATOR
+                         or request.user.is_moderator
                          or request.user.is_admin)))
 
 

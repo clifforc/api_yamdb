@@ -12,31 +12,51 @@ class User(AbstractUser):
         max_length=constants.USERNAME_MAX_LENGTH,
         unique=True,
         validators=[UnicodeUsernameValidator(), validate_username_not_me],
+        verbose_name='Имя пользователя'
     )
     email = models.EmailField(
         max_length=constants.EMAIL_MAX_LENGTH,
-        unique=True)
+        unique=True
+    )
+    first_name = models.CharField(
+        max_length=constants.FIRSTNAME_MAX_LENGTH,
+        blank=True,
+        verbose_name='Имя'
+    )
+    last_name = models.CharField(
+        max_length=constants.LASTNAME_MAX_LENGTH,
+        blank=True,
+        verbose_name='Фамилия'
+    )
     role = models.CharField(
         max_length=constants.MAX_ROLE_LENGTH,
         choices=constants.ROLES,
-        default=constants.USER)
-    bio = models.TextField(blank=True)
-
-    @property
-    def is_admin(self):
-        return (self.role == constants.ADMIN
-                or self.is_superuser or self.is_staff)
+        default=constants.USER,
+        verbose_name='Роль'
+    )
+    bio = models.TextField(blank=True, verbose_name='О себе')
 
     class Meta(AbstractUser.Meta):
+        ordering = ['username']
         verbose_name = 'пользователь'
         verbose_name_plural = 'Пользователи'
 
     def __str__(self):
         return self.username
 
+    @property
+    def is_admin(self):
+        return self.role == constants.ADMIN or self.is_staff
+
+    @property
+    def is_moderator(self):
+        return self.role == constants.MODERATOR
+
 
 class CommonInfo(models.Model):
-    name = models.CharField(max_length=constants.NAME_MAX_LENGTH)
+    name = models.CharField(
+        max_length=constants.NAME_MAX_LENGTH, verbose_name='Название'
+    )
 
     class Meta:
         abstract = True
@@ -47,7 +67,7 @@ class CommonInfo(models.Model):
 
 
 class CommonInfoCategoryGenre(models.Model):
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, verbose_name='Слаг')
 
     class Meta:
         abstract = True
@@ -56,36 +76,51 @@ class CommonInfoCategoryGenre(models.Model):
 class Category(CommonInfo, CommonInfoCategoryGenre):
 
     class Meta(CommonInfo.Meta):
-        verbose_name = 'category'
+        verbose_name = 'категория'
+        verbose_name_plural = 'Категории'
 
 
 class Genre(CommonInfo, CommonInfoCategoryGenre):
 
     class Meta(CommonInfo.Meta):
-        verbose_name = 'genre'
+        verbose_name = 'жанр'
+        verbose_name_plural = 'Жанры'
 
 
 class Title(CommonInfo):
     year = models.SmallIntegerField(
-        validators=[validate_max_year]
+        validators=[validate_max_year], verbose_name='Год'
     )
-    description = models.TextField(null=True, blank=True)
-    genre = models.ManyToManyField(Genre, through='TitleGenre')
+    description = models.TextField(
+        null=True, blank=True, verbose_name='Описание'
+    )
+    genre = models.ManyToManyField(
+        Genre, through='TitleGenre', verbose_name='Жанр'
+    )
     category = models.ForeignKey(
-        Category, on_delete=models.PROTECT, related_name='titles'
+        Category, on_delete=models.PROTECT,
+        related_name='titles', verbose_name='Категория'
     )
 
     class Meta(CommonInfo.Meta):
-        verbose_name = 'title'
+        verbose_name = 'произведение'
+        verbose_name_plural = 'Произведения'
 
 
 class TitleGenre(models.Model):
     title = models.ForeignKey(
-        Title, on_delete=models.CASCADE
+        Title, on_delete=models.CASCADE, verbose_name='Произведение'
     )
     genre = models.ForeignKey(
-        Genre, on_delete=models.PROTECT
+        Genre, on_delete=models.PROTECT, verbose_name='Жанр'
     )
+
+    class Meta:
+        verbose_name = 'жанр произведения'
+        verbose_name_plural = 'Жанры произведения'
+
+    def __str__(self):
+        return f"{self.title} - {self.genre}"
 
 
 class ReviewCommentBaseModel(models.Model):
@@ -98,6 +133,9 @@ class ReviewCommentBaseModel(models.Model):
     class Meta:
         abstract = True
         ordering = ['-pub_date']
+
+    def __str__(self):
+        return self.text[:constants.SHORT_REVIEW_COMMENT]
 
 
 class Review(ReviewCommentBaseModel):
