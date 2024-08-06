@@ -98,7 +98,7 @@ class TitleGenre(models.Model):
     )
 
     def __str__(self):
-        return self.title
+        return f"{self.title} - {self.genre}"
 
     class Meta:
         verbose_name = 'жанр произведения'
