@@ -58,14 +58,14 @@ class CommonInfoCategoryGenre(models.Model):
 class Category(CommonInfo, CommonInfoCategoryGenre):
 
     class Meta(CommonInfo.Meta):
-        verbose_name = 'Категория'
+        verbose_name = 'категория'
         verbose_name_plural = 'Категории'
 
 
 class Genre(CommonInfo, CommonInfoCategoryGenre):
 
     class Meta(CommonInfo.Meta):
-        verbose_name = 'Жанр'
+        verbose_name = 'жанр'
         verbose_name_plural = 'Жанры'
 
 
@@ -85,7 +85,7 @@ class Title(CommonInfo):
     )
 
     class Meta(CommonInfo.Meta):
-        verbose_name = 'Произведение'
+        verbose_name = 'произведение'
         verbose_name_plural = 'Произведения'
 
 
@@ -98,10 +98,10 @@ class TitleGenre(models.Model):
     )
 
     def __str__(self):
-        return 'Все'
+        return self.title
 
     class Meta:
-        verbose_name = 'Жанр произведения'
+        verbose_name = 'жанр произведения'
         verbose_name_plural = 'Жанры произведения'
 
 
