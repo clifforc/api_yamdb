@@ -110,9 +110,9 @@ class TitleCreateSerializer(serializers.ModelSerializer):
         many=True,
         slug_field='slug',
         allow_empty=False,
-        required=True
+        required=True,
+        allow_null=False
     )
-
     category = serializers.SlugRelatedField(
         queryset=Category.objects.all(),
         slug_field='slug',
@@ -124,12 +124,12 @@ class TitleCreateSerializer(serializers.ModelSerializer):
             'id', 'name', 'year', 'description', 'genre', 'category'
         )
 
-    def validate(self, data):
-        if 'year' in data and data['year'] > date.today().year:
+    def validate_year(self, value):
+        if value is not None and value > date.today().year:
             raise serializers.ValidationError(
-                {'year': ['Год произведения не может быть больше текущего!']}
+                {value: ['Год произведения не может быть больше текущего!']}
             )
-        return data
+        return value
 
 
 class ReviewSerializer(serializers.ModelSerializer):

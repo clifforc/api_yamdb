@@ -16,5 +16,4 @@ def validate_username_not_me(value):
 def validate_max_year(value):
     if value <= date.today().year:
         return value
-    else:
-        raise ValidationError('Введите год произведения, не больше текущего.')
+    raise ValidationError('Введите год произведения, не больше текущего.')

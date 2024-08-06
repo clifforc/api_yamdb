@@ -87,6 +87,9 @@ class TitleGenre(models.Model):
         Genre, on_delete=models.PROTECT
     )
 
+    def __str__(self):
+        return '__all__'
+
 
 class ReviewCommentBaseModel(models.Model):
     text = models.TextField('Текст', help_text='Текст отзыва')
