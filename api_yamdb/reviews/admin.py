@@ -53,22 +53,20 @@ class CommentAdmin(admin.ModelAdmin):
     pass
 
 
-class GenreInline(admin.StackedInline):
-    model = TitleGenre
-    extra = 0
-
-
 @admin.register(Title)
 class TitleAdmin(admin.ModelAdmin):
     list_display = (
         'name',
         'year',
         'category',
+        'genres'
     )
     list_editable = ('year', 'category',)
-    inlines = (
-        GenreInline,
-    )
+
+    def genres(self, obj):
+        return ",\n".join([g.name for g in obj.genre.all()])
+
+    genres.short_description = "Жанры"
 
 
 @admin.register(Genre)

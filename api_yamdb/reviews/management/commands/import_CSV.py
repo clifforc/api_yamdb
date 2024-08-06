@@ -96,4 +96,5 @@ class Command(BaseCommand):
         csv_file_path = DIRECTORY + file_name
         with open(csv_file_path, 'r', encoding="utf-8") as file:
             csv_reader = csv.DictReader(file)
-            exec(NAMES_FILE[file_name])
+            if csv_reader is not None:
+                exec(NAMES_FILE[file_name])

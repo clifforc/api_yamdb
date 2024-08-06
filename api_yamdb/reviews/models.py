@@ -54,7 +54,9 @@ class User(AbstractUser):
 
 
 class CommonInfo(models.Model):
-    name = models.CharField(max_length=constants.NAME_MAX_LENGTH)
+    name = models.CharField(
+        max_length=constants.NAME_MAX_LENGTH, verbose_name='Название'
+    )
 
     class Meta:
         abstract = True
@@ -65,7 +67,7 @@ class CommonInfo(models.Model):
 
 
 class CommonInfoCategoryGenre(models.Model):
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, verbose_name='Слаг')
 
     class Meta:
         abstract = True
@@ -74,27 +76,35 @@ class CommonInfoCategoryGenre(models.Model):
 class Category(CommonInfo, CommonInfoCategoryGenre):
 
     class Meta(CommonInfo.Meta):
-        verbose_name = 'category'
+        verbose_name = 'категория'
+        verbose_name_plural = 'Категории'
 
 
 class Genre(CommonInfo, CommonInfoCategoryGenre):
 
     class Meta(CommonInfo.Meta):
-        verbose_name = 'genre'
+        verbose_name = 'жанр'
+        verbose_name_plural = 'Жанры'
 
 
 class Title(CommonInfo):
     year = models.SmallIntegerField(
-        validators=[validate_max_year]
+        validators=[validate_max_year], verbose_name='Год'
     )
-    description = models.TextField(null=True, blank=True)
-    genre = models.ManyToManyField(Genre, through='TitleGenre')
+    description = models.TextField(
+        null=True, blank=True, verbose_name='Описание'
+    )
+    genre = models.ManyToManyField(
+        Genre, through='TitleGenre', verbose_name='Жанр'
+    )
     category = models.ForeignKey(
-        Category, on_delete=models.PROTECT, related_name='titles'
+        Category, on_delete=models.PROTECT,
+        related_name='titles', verbose_name='Категория'
     )
 
     class Meta(CommonInfo.Meta):
-        verbose_name = 'title'
+        verbose_name = 'произведение'
+        verbose_name_plural = 'Произведения'
 
 
 class TitleGenre(models.Model):
@@ -104,6 +114,13 @@ class TitleGenre(models.Model):
     genre = models.ForeignKey(
         Genre, on_delete=models.PROTECT
     )
+
+    def __str__(self):
+        return f"{self.title} - {self.genre}"
+
+    class Meta:
+        verbose_name = 'жанр произведения'
+        verbose_name_plural = 'Жанры произведения'
 
 
 class ReviewCommentBaseModel(models.Model):
