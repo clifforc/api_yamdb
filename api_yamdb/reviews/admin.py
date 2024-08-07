@@ -76,10 +76,11 @@ class TitleAdmin(admin.ModelAdmin):
     list_editable = ('year', 'category')
     filter_horizontal = ('genre',)
 
+    @admin.display(
+        description='Жанры',
+    )
     def genres(self, obj):
         return ",\n".join([g.name for g in obj.genre.all()])
-
-    genres.short_description = "Жанры"
 
 
 @admin.register(Genre)
