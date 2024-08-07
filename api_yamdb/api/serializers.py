@@ -1,5 +1,3 @@
-from datetime import date
-
 from django.contrib.auth import get_user_model
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from rest_framework import serializers
