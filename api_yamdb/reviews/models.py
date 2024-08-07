@@ -18,16 +18,6 @@ class User(AbstractUser):
         max_length=constants.EMAIL_MAX_LENGTH,
         unique=True
     )
-    first_name = models.CharField(
-        max_length=constants.FIRSTNAME_MAX_LENGTH,
-        blank=True,
-        verbose_name='Имя'
-    )
-    last_name = models.CharField(
-        max_length=constants.LASTNAME_MAX_LENGTH,
-        blank=True,
-        verbose_name='Фамилия'
-    )
     role = models.CharField(
         max_length=constants.MAX_ROLE_LENGTH,
         choices=constants.ROLES,
