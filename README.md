@@ -6,27 +6,12 @@
 
 ## Технологии
 
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 ![Django](https://img.shields.io/badge/django-%23092E20.svg?style=for-the-badge&logo=django&logoColor=white)
 ![DjangoREST](https://img.shields.io/badge/DJANGO-REST-ff1709?style=for-the-badge&logo=django&logoColor=white&color=ff1709&labelColor=gray)
-![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 ![Postman](https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white)
 
 ## Авторы
-
-### [Кирилл Мансуров](https://github.com/Kirill374mansurov)</br>
-Разрабатывал модели, view и эндпойнты для:
-- произведений, 
-- категорий, 
-- жанров;</br> 
-Реализация импорта данных из csv файлов. 
-    
-
-### [Евгений Олейников](https://github.com/olejnikoves2)</br>
-Разрабатывал модели, view и эндпойнты для:
-- отзывов, 
-- комментариев, 
-- рейтингов произведений.
-    
 
 ### [Александр Мальцев](https://github.com/clifforc)</br>
 Разрабатывал часть, касающуюся управления пользователями:
@@ -34,7 +19,19 @@
 - права доступа, 
 - работу с токеном, 
 - систему подтверждения через e-mail.
-  
+
+### [Кирилл Мансуров](https://github.com/Kirill374mansurov)</br>
+Разрабатывал модели, view и эндпойнты для:
+- произведений, 
+- категорий, 
+- жанров;</br> 
+Реализация импорта данных из csv файлов. 
+
+### [Евгений Олейников](https://github.com/olejnikoves2)</br>
+Разрабатывал модели, view и эндпойнты для:
+- отзывов, 
+- комментариев, 
+- рейтингов произведений.
 
 ## Функциональность
 
@@ -76,7 +73,7 @@ cd api_yamdb
 Cоздать и активировать виртуальное окружение:
 
 ```
-python -m venv .venv
+python3 -m venv .venv
 ```
 
 * Если у вас Linux/macOS
@@ -92,7 +89,7 @@ python -m venv .venv
     ```
 
 ```
-python -m pip install --upgrade pip
+python3 -m pip install --upgrade pip
 ```
 
 Установить зависимости из файла requirements.txt:
@@ -104,20 +101,20 @@ pip install -r requirements.txt
 Выполнить миграции:
 
 ```
-python manage.py makemigrations
-python manage.py migrate
+python3 manage.py makemigrations
+python3 manage.py migrate
 ```
 
 Импортировать данные:
 
 ```
-python manage.py run_import
+python3 manage.py run_import
 ```
 
 Запустить проект:
 
 ```
-python manage.py runserver
+python3 manage.py runserver
 ```
 
 ## Примеры запросов к API:
