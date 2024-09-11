@@ -63,7 +63,7 @@ Developed models, views, and endpoints for:
 Clone the repository and navigate to it in the command line:
 
 ```
-git clone https://github.com/Kirill374mansurov/api_yamdb.git
+git clone https://github.com/clifforc/api_yamdb.git
 ```
 
 ```
